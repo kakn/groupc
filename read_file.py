@@ -49,7 +49,4 @@ for line in lines:
 		blogdict["date"].append(line[5])
 		blogdict["text"].append(line[6])
 	
-		
-	
-
-	
+print("prut")
