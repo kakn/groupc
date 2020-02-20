@@ -48,3 +48,8 @@ for line in lines:
 		blogdict["sign"].append(line[4])
 		blogdict["date"].append(line[5])
 		blogdict["text"].append(line[6])
+<<<<<<< HEAD
+=======
+
+print("prut")
+>>>>>>> 111b41393a47ca761f4f5990812660c53818c797
