@@ -1,3 +1,5 @@
+# Bayes
+
 # Feature extractor
 
 # Creates a list of top 3000 common words in frequency distribution
@@ -13,3 +15,19 @@ def find_features(text):
 
 	return features
 	
+#def labeling(feature, label):
+#	for 
+#	labeled_data = [(feature
+	
+# Creates a list with set pairs of (features, label) with each text and gender in the dict
+featuresets = [(find_features(n), gender) for (n, gender) in (blogdict["text"], blogdict["gender"])]
+
+# Creates a training set with 70% of the featureset data
+training_set = featuresets[:round(len(featuresets)*0.7)]
+
+# Creates a dev and a test set with each 50% of the rest of the featureset data
+# (corresponding to 15% of the total)
+temp_set = featuresets[round(len(featuresets)*0.7):]
+
+dev_set = temp_set[:round(len(temp_set)/2)]
+test_set = temp_set[round(len(temp_set)/2):]
