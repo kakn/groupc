@@ -71,19 +71,22 @@ def main():
 	#Looping through each blog text to the "text" key, and then tokenize, stemming and removing stopwords in the text.
 	for i in range(0,len(blogdict["id"])):
 		blogdict["text"][i] = stem_and_remove_stopwords_Sentence(blogdict["text"][i])
-	
-	Freq_list=[]
 
-	for i in blogdict["text"]: 
-		Freq_list.append(word_tokenize(i))
-	print(Freq_list[0:3])
-	print(FreqDist(Freq_list).most_common(10))
+	#First i takes all blogposts and tokenizes to a new list. 
+	Freq_list=[]
+	for i in range(0,len(blogdict["text"][i])): 
+		Freq_list.append(word_tokenize(blogdict["text"][i]))
+	#Then i transform the list of list to just a single list.
+	flat_list = [item for sublist in Freq_list for item in sublist]
+	#Where after i use the FreqDist on it. 
+	FD=FreqDist(flat_list)
+	print(FD.most_common(50))
+	
 def gender_features(word):
 	#Takes a text and then checks which of the unigrams we got form our freq distribution, are present in the blog post.
 	#
 	return {'last_letter': word[-1]}
 gender_features('Shrek')
-
 
 if __name__=='__main__':
 	main()
