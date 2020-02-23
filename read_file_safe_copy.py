@@ -3,6 +3,7 @@
 import csv
 import re
 import langid
+import random
 from langid.langid import LanguageIdentifier, model
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import PorterStemmer 
@@ -65,6 +66,62 @@ def stem_and_remove_stopwords_Sentence(sentence):
     		stem_sentence.append(porter.stem(word))
     		stem_sentence.append(" ")
     return "".join(stem_sentence)
+	
+def freq_model(blogdict):
+	#First i takes all blogposts and tokenizes to a new list. 
+	Freq_list=[]
+	for i in range(0,len(blogdict["text"])): 
+		Freq_list.append(word_tokenize(blogdict["text"][i]))
+	#Then i transform the list of list to just a single list.
+	flat_list = [item for sublist in Freq_list for item in sublist]
+	#Where after i use the FreqDist on it. 
+	FD=FreqDist(flat_list)
+	return FD
+	
+# Feature extractor
+# Inputs text and returns a dictionary with the commons words as keys, 
+# and the values True/False if the common word appears in the text
+
+def find_features(document, FD):
+	# Creates a list of top 3000 common words in frequency distribution
+	word_features = list(w[0] for w in FD.most_common(3000))
+	
+	words = set(document)
+	features = {}
+	for w in word_features:
+		features[w] = (w in words)
+	
+	return features
+
+def creating_sets(blogdict, FD):
+	documents = [(text, gender)
+	for gender in blogdict["gender"]
+	for text in blogdict["text"]]
+	random.shuffle(documents)
+	
+	print(documents[2])
+	
+	# Creates a list with set pairs of (features, label) with each text and gender in the dict
+	"""featuresets = [(find_features(n, FD), gender)
+	for gender in documents[1]
+	for n in documents[0]]"""
+	featuresets = [(find_features(n, FD), gender)
+	for gender in blogdict["gender"]
+	for n in blogdict["text"]]
+	
+	print(featuresets[2])
+
+	# Creates a training set with 70% of the featureset data
+	training_set = featuresets[:round(len(featuresets)*0.7)]
+
+	# Creates a dev and a test set with each 50% of the rest of the featureset data
+	# (corresponding to 15% of the total)
+	temp_set = featuresets[round(len(featuresets)*0.7):]
+
+	dev_set = temp_set[:round(len(temp_set)/2)]
+	test_set = temp_set[round(len(temp_set)/2):]
+	
+	return training_set, dev_set, test_set
 
 def main(): 
 	blogdict = read_file("sample.csv")
@@ -72,21 +129,11 @@ def main():
 	for i in range(0,len(blogdict["id"])):
 		blogdict["text"][i] = stem_and_remove_stopwords_Sentence(blogdict["text"][i])
 
-	#First i takes all blogposts and tokenizes to a new list. 
-	Freq_list=[]
-	for i in range(0,len(blogdict["text"][i])): 
-		Freq_list.append(word_tokenize(blogdict["text"][i]))
-	#Then i transform the list of list to just a single list.
-	flat_list = [item for sublist in Freq_list for item in sublist]
-	#Where after i use the FreqDist on it. 
-	FD=FreqDist(flat_list)
-	print(FD.most_common(50))
+	FD = freq_model(blogdict)
 	
-def gender_features(word):
-	#Takes a text and then checks which of the unigrams we got form our freq distribution, are present in the blog post.
-	#
-	return {'last_letter': word[-1]}
-gender_features('Shrek')
+	# Creates sets of data by using find_features function
+	creating_sets(blogdict, FD)
+
 
 if __name__=='__main__':
 	main()
